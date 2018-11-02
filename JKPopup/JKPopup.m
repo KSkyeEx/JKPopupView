@@ -26,6 +26,26 @@ const JKPopupLayout JKPopupLayoutCenter = { JKPopupHorizontalLayoutCenter, JKPop
 - (JKPopupLayout)JKPopupLayoutValue;
 @end
 
+@interface JKPopupController : UIViewController
+
+@end
+
+@implementation JKPopupController
+
+- (UIStatusBarStyle)preferredStatusBarStyle
+{
+    __block UIStatusBarStyle style = UIStatusBarStyleDefault;
+    [[UIApplication sharedApplication].windows enumerateObjectsUsingBlock:^(__kindof UIWindow * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
+        if (obj.windowLevel == UIWindowLevelNormal) {
+            style = obj.rootViewController.preferredStatusBarStyle;
+            *stop = YES;
+        }
+    }];
+    return style;
+}
+
+@end
+
 
 @interface JKPopup ()
 @property (nonatomic, strong, readwrite) UIView *backgroundView;
@@ -57,6 +77,7 @@ const JKPopupLayout JKPopupLayoutCenter = { JKPopupHorizontalLayoutCenter, JKPop
 - (id)init {
     self.alertWindow = [[UIWindow alloc] initWithFrame:[UIScreen mainScreen].bounds];
     self.alertWindow.windowLevel = UIWindowLevelAlert;
+    self.alertWindow.rootViewController = [[JKPopupController alloc] init];
     return [self initWithFrame:[[UIScreen mainScreen] bounds]];
 }
 
@@ -510,7 +531,7 @@ const JKPopupLayout JKPopupLayoutCenter = { JKPopupHorizontalLayoutCenter, JKPop
             
             // Prepare by adding to the top window.
             if(!self.superview){
-                [self.alertWindow addSubview:self];
+                [self.alertWindow.rootViewController.view addSubview:self];
                 [self.alertWindow makeKeyAndVisible];
             }
             
