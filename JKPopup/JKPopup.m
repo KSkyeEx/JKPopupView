@@ -60,8 +60,9 @@ const JKPopupLayout JKPopupLayoutCenter = { JKPopupHorizontalLayoutCenter, JKPop
 @implementation JKPopup
 
 - (void)dealloc {
+    [self.alertWindow resignKeyWindow];
+    self.alertWindow = nil;
     [NSObject cancelPreviousPerformRequestsWithTarget:self];
-    
     // stop listening to notifications
     [[NSNotificationCenter defaultCenter] removeObserver:self];
 }
