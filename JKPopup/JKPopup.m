@@ -34,14 +34,7 @@ const JKPopupLayout JKPopupLayoutCenter = { JKPopupHorizontalLayoutCenter, JKPop
 
 - (UIStatusBarStyle)preferredStatusBarStyle
 {
-    __block UIStatusBarStyle style = UIStatusBarStyleDefault;
-    [[UIApplication sharedApplication].windows enumerateObjectsUsingBlock:^(__kindof UIWindow * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
-        if (obj.windowLevel == UIWindowLevelNormal) {
-            style = obj.rootViewController.preferredStatusBarStyle;
-            *stop = YES;
-        }
-    }];
-    return style;
+    return [UIApplication sharedApplication].statusBarStyle;
 }
 
 @end
