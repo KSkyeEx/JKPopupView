@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
 s.name = 'JKPopup'
-s.version = '0.0.3'
+s.version = '0.0.4'
 s.summary = 'An easy way to use frame'
 s.homepage = 'https://github.com/JokerKin/JKPopup'
 s.license = 'MIT'
