@@ -1,0 +1,6 @@
+framework module JKPopup {
+  umbrella header "JKPopup-umbrella.h"
+
+  export *
+  module * { export * }
+}

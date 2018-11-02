@@ -1,0 +1,16 @@
+PODS:
+  - JKPopup (0.0.3)
+
+DEPENDENCIES:
+  - JKPopup (from `../`)
+
+EXTERNAL SOURCES:
+  JKPopup:
+    :path: "../"
+
+SPEC CHECKSUMS:
+  JKPopup: e0135f214bb2a29fc1d22b730175554ad1ff91b7
+
+PODFILE CHECKSUM: 13fde8153d1641067a097155273b6a2bcb15a4e4
+
+COCOAPODS: 1.5.3
