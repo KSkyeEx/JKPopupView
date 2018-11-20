@@ -45,9 +45,10 @@ typedef NS_ENUM(NSInteger, JKPopupDismissType) {
 
 // JKPopupMaskType
 typedef NS_ENUM(NSInteger, JKPopupMaskType) {
-    JKPopupMaskTypeNone = 0, // 允许与底层视图交互。
-    JKPopupMaskTypeClear, // 不允许与底层视图交互。
+    JKPopupMaskTypeNone = 0, // 不允许与底层视图交互。
+    JKPopupMaskTypeClear = JKPopupMaskTypeNone, // 不允许与底层视图交互。
     JKPopupMaskTypeDimmed, // 不允许与底层视图交互，暗淡背景。
+    JKPopupMaskTypeVisualEffect //毛玻璃效果
 };
 
 @interface JKPopupView : UIView
@@ -104,10 +105,6 @@ typedef NS_ENUM(NSInteger, JKPopupMaskType) {
                              maskType:(JKPopupMaskType)maskType
              dismissOnBackgroundTouch:(BOOL)shouldDismissOnBackgroundTouch
                 dismissOnContentTouch:(BOOL)shouldDismissOnContentTouch;
-/**
- 释放应用程序中的所有弹出窗口。 用作清理的故障保护。
- */
-+ (void)dismissAllPopups;
 /**
  显示具有中心布局的弹出窗口 动画由showType决定。
  */

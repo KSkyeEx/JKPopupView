@@ -47,6 +47,18 @@
 
 static NSInteger const kAnimationOptionCurveIOS7 = (7 << 16);
 
+//全局信号量
+dispatch_semaphore_t globalInstancesLock;
+//执行QUEUE的Name
+char *QUEUE_NAME = "com.alert.queue";
+//初始化 -- 借鉴YYWebImage的写法
+static void alertViewInitGlobal() {
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        globalInstancesLock = dispatch_semaphore_create(1);
+    });
+}
+
 @interface JKPopupController : UIViewController
 
 @end
@@ -97,6 +109,7 @@ static NSInteger const kAnimationOptionCurveIOS7 = (7 << 16);
 {
     self = [super initWithFrame:frame];
     if (self) {
+        alertViewInitGlobal();
         self.userInteractionEnabled = YES;
         self.backgroundColor = [UIColor clearColor];
         self.alpha = 0;
@@ -146,7 +159,6 @@ static NSInteger const kAnimationOptionCurveIOS7 = (7 << 16);
 - (void)setupBlock
 {
     weakify(self);
-    
     self.showBackgroundAnimationBlock = ^{
         strongify(self);
         self.backgroundView.alpha = 1;
@@ -175,6 +187,10 @@ static NSInteger const kAnimationOptionCurveIOS7 = (7 << 16);
     self.dismissCompletionBlock = ^(BOOL finished) {
         strongify(self);
         [self removeFromSuperview];
+        dispatch_async(dispatch_queue_create(QUEUE_NAME, DISPATCH_QUEUE_SERIAL), ^{
+            //Release Lock
+            dispatch_semaphore_signal(globalInstancesLock);
+        });
         self.isBeingShown = NO;
         self.isShowing = NO;
         self.isBeingDismissed = NO;
@@ -200,12 +216,7 @@ static NSInteger const kAnimationOptionCurveIOS7 = (7 << 16);
         if (self.shouldDismissOnBackgroundTouch) {
             [self dismiss:YES];
         }
-        //JKPopupMaskTypeNone，则返回nil，以便触摸传递到底层视图。
-        if (self.maskType == JKPopupMaskTypeNone) {
-            return nil;
-        } else {
-            return hitView;
-        }
+        return hitView;
     } else {
         //如果视图位于容器视图和内容触摸标志设置，则尝试隐藏。
         if ([hitView isDescendantOfView:self.containerView]) {
@@ -235,18 +246,6 @@ static NSInteger const kAnimationOptionCurveIOS7 = (7 << 16);
     popupView.shouldDismissOnContentTouch = shouldDismissOnContentTouch;
     return popupView;
 }
-+ (void)dismissAllPopups
-{
-    NSArray* windows = [[UIApplication sharedApplication] windows];
-    for (UIWindow* window in windows) {
-        if (window.windowLevel == UIWindowLevelAlert) {
-//            [window forEachPopupDoBlock:^(JKPopup *popup) {
-//                [popup dismiss:NO];
-//            }];
-        }
-    }
-}
-
 #pragma mark - Public
 - (void)show
 {
@@ -452,15 +451,20 @@ static NSInteger const kAnimationOptionCurveIOS7 = (7 << 16);
         self.isShowing = NO;
         self.isBeingDismissed = NO;
         [self willStartShowing];
-        dispatch_async(dispatch_get_main_queue(), ^{
-            [self setupBackgroundView:self.backgroundView maskType:self.maskType showType:self.showType];
-            [self addContentView:self.contentView containerView:self.containerView];
-            if (!CGPointEqualToPoint(center, CGPointZero)) {
-                [self setupFrameWithFromView:view center:center finalContainerFrame:self.finalContainerFrame containerAutoresizingMask:self.containerAutoresizingMask];
-            } else {
-                [self setupFrameWithLayout:layout finalContainerFrame:self.finalContainerFrame containerAutoresizingMask:self.containerAutoresizingMask];
-            }
-            [self showWithType:self.showType containerView:self.containerView finalContainerFrame:self.finalContainerFrame];
+        dispatch_async(dispatch_queue_create(QUEUE_NAME, DISPATCH_QUEUE_SERIAL), ^{
+            //Lock
+            dispatch_semaphore_wait(globalInstancesLock, DISPATCH_TIME_FOREVER);
+            dispatch_async(dispatch_get_main_queue(), ^{
+                [self setupBackgroundView:self.backgroundView maskType:self.maskType showType:self.showType];
+                [self addContentView:self.contentView containerView:self.containerView];
+                if (!CGPointEqualToPoint(center, CGPointZero)) {
+                    [self setupFrameWithFromView:view center:center finalContainerFrame:self.finalContainerFrame containerAutoresizingMask:self.containerAutoresizingMask];
+                } else {
+                    [self setupFrameWithLayout:layout finalContainerFrame:self.finalContainerFrame containerAutoresizingMask:self.containerAutoresizingMask];
+                }
+                self.containerView.autoresizingMask = self.containerAutoresizingMask;
+                [self showWithType:self.showType containerView:self.containerView finalContainerFrame:self.finalContainerFrame];
+            });
         });
     }
 }
@@ -475,10 +479,33 @@ static NSInteger const kAnimationOptionCurveIOS7 = (7 << 16);
     self.hidden = NO;
     self.alpha = 1.0;
     backgroundView.alpha = 0.0;
-    if (maskType == JKPopupMaskTypeDimmed) {
-        backgroundView.backgroundColor = [UIColor colorWithRed:(0.0/255.0f) green:(0.0/255.0f) blue:(0.0/255.0f) alpha:self.dimmedMaskAlpha];
-    } else {
-        backgroundView.backgroundColor = [UIColor clearColor];
+    switch (maskType) {
+        case JKPopupMaskTypeNone | JKPopupMaskTypeClear:
+        {
+            backgroundView.backgroundColor = [UIColor clearColor];
+        }
+            break;
+        case JKPopupMaskTypeDimmed:
+        {
+            backgroundView.backgroundColor = [UIColor colorWithRed:(0.0/255.0f) green:(0.0/255.0f) blue:(0.0/255.0f) alpha:self.dimmedMaskAlpha];
+        }
+            break;
+        case JKPopupMaskTypeVisualEffect:
+        {
+            [self.backgroundView removeFromSuperview];
+            UIVisualEffectView *effectView = [[UIVisualEffectView alloc] initWithFrame:self.bounds];
+            effectView.effect = [UIBlurEffect effectWithStyle:UIBlurEffectStyleLight];
+            effectView.userInteractionEnabled = NO;
+            effectView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
+            self.backgroundView = effectView;
+            [self insertSubview:self.backgroundView atIndex:0];
+        }
+            break;
+        default:
+        {
+            backgroundView.backgroundColor = [UIColor clearColor];
+        }
+            break;
     }
     if (showType != JKPopupShowTypeNone) {
         // Make fade happen faster than motion. Use linear for fades.
@@ -776,27 +803,6 @@ static NSInteger const kAnimationOptionCurveIOS7 = (7 << 16);
 
 - (void)updateForInterfaceOrientation
 {
-    // We must manually fix orientation prior to iOS 8
-    UIInterfaceOrientation orientation = [[UIApplication sharedApplication] statusBarOrientation];
-    CGFloat angle;
-    
-    switch (orientation) {
-        case UIInterfaceOrientationPortraitUpsideDown:
-            angle = M_PI;
-            break;
-        case UIInterfaceOrientationLandscapeLeft:
-            angle = -M_PI/2.0f;;
-            
-            break;
-        case UIInterfaceOrientationLandscapeRight:
-            angle = M_PI/2.0f;
-            
-            break;
-        default: // as UIInterfaceOrientationPortrait
-            angle = 0.0;
-            break;
-    }
-    self.transform = CGAffineTransformMakeRotation(angle);
     self.frame = self.window.bounds;
 }
 

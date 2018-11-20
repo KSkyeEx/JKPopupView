@@ -95,7 +95,7 @@ typedef NS_ENUM(NSInteger, CellType) {
 
 @property (nonatomic, strong) UITableView *tableView;
 @property (nonatomic, strong) UIPopoverController *popover;
-@property (nonatomic, strong) JKPopupView *popup;
+//@property (nonatomic, strong) JKPopupView *popup;
 // Private
 - (void)updateFieldTableView:(UITableView *)tableView;
 - (NSInteger)valueForRow:(NSInteger)row inFieldWithTag:(NSInteger)tag;
@@ -170,11 +170,13 @@ typedef NS_ENUM(NSInteger, CellType) {
         
          self.maskTypes = @[@(JKPopupMaskTypeNone),
                        @(JKPopupMaskTypeClear),
-                       @(JKPopupMaskTypeDimmed)];
+                       @(JKPopupMaskTypeDimmed),
+                            @(JKPopupMaskTypeVisualEffect)];
         
          self.namesForMaskTypes = @{@(JKPopupMaskTypeNone) : @"None",
                                @(JKPopupMaskTypeClear) : @"Clear",
-                               @(JKPopupMaskTypeDimmed) : @"Dimmed"};
+                               @(JKPopupMaskTypeDimmed) : @"Dimmed",
+                                    @(JKPopupMaskTypeVisualEffect) : @"VisualEffect"};
         
          self.showTypes = @[@(JKPopupShowTypeNone),
                        @(JKPopupShowTypeFadeIn),
@@ -347,6 +349,13 @@ typedef NS_ENUM(NSInteger, CellType) {
 
 - (void)showButtonPressed:(id)sender
 {
+    [self testAlert];
+    [self testAlert];
+    [self testAlert];
+    [self testAlert];
+}
+
+- (void)testAlert {
     // Generate content view to present
     UIView *contentView = [[UIView alloc] init];
     contentView.translatesAutoresizingMaskIntoConstraints = NO;
@@ -377,9 +386,9 @@ typedef NS_ENUM(NSInteger, CellType) {
     NSDictionary *views = NSDictionaryOfVariableBindings(contentView, dismissButton, dismissLabel);
     
     [contentView addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"V:|-(16)-[dismissLabel]-(10)-[dismissButton]-(24)-|"
-                                                                         options:NSLayoutFormatAlignAllCenterX
-                                                                         metrics:nil
-                                                                           views:views]];
+                                                                        options:NSLayoutFormatAlignAllCenterX
+                                                                        metrics:nil
+                                                                          views:views]];
     
     [contentView addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"H:|-(36)-[dismissLabel]-(36)-|"
                                                                         options:0
@@ -398,16 +407,12 @@ typedef NS_ENUM(NSInteger, CellType) {
     } else {
         [popup showWithLayout:layout];
     }
-    self.popup = popup;
 }
 
 
 - (void)dismissButtonPressed:(id)sender
 {
-    if ([sender isKindOfClass:[UIView class]]) {
-        [self.popup dismiss:YES];
-        self.popup = nil;
-    }
+
 }
 
 
