@@ -18,8 +18,8 @@ s.author             = { "joker" => "https://github.com/JokerKin" }
 s.platform     = :ios, "8.0"
 s.ios.deployment_target = "8.0"
 
-s.public_header_files = 'JKPopupView/**/**/JKPopupView.h'
-s.source       = { :git => "https://github.com/JokerKin/JKPopupView.git", :tag => "#{s.version}", :submodules => true}
+s.public_header_files = 'JKPopupView/**/**/**/*.h'
+s.source       = { :git => "https://github.com/JokerKin/JKPopupView.git", :tag => "#{s.version}"}
 
-s.source_files  = "JKPopupView", "JKPopupView/JKPopupView/JKPopupView/**/*.{h,m}"
+s.source_files  = "JKPopupView", "JKPopupView/JKPopupView/JKPopupView/JKPopupView/*.{h,m}"
 end
