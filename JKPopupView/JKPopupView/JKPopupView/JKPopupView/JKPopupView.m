@@ -497,6 +497,7 @@ static void alertViewInitGlobal() {
             effectView.effect = [UIBlurEffect effectWithStyle:UIBlurEffectStyleLight];
             effectView.userInteractionEnabled = NO;
             effectView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
+            effectView.backgroundColor = [UIColor colorWithRed:(0.0/255.0f) green:(0.0/255.0f) blue:(0.0/255.0f) alpha:self.dimmedMaskAlpha];
             self.backgroundView = effectView;
             [self insertSubview:self.backgroundView atIndex:0];
         }
