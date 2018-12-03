@@ -79,6 +79,7 @@ static void alertViewInitGlobal() {
 @property (nonatomic, assign, readwrite) BOOL isShowing;
 @property (nonatomic, assign, readwrite) BOOL isBeingDismissed;
 @property (nonatomic, strong) UIWindow *alertWindow;
+@property (nonatomic, weak) UIWindow *keyWindow;
 @property (nonatomic, assign) NSTimeInterval duration;
 //确定容器的最终位置和必要的autoresizingMask。
 @property (nonatomic, assign) UIViewAutoresizing containerAutoresizingMask;
@@ -187,6 +188,8 @@ static void alertViewInitGlobal() {
     self.dismissCompletionBlock = ^(BOOL finished) {
         strongify(self);
         [self removeFromSuperview];
+        [self.alertWindow resignKeyWindow];
+        [self.keyWindow makeKeyAndVisible];
         dispatch_async(dispatch_queue_create(QUEUE_NAME, DISPATCH_QUEUE_SERIAL), ^{
             //Release Lock
             dispatch_semaphore_signal(globalInstancesLock);
@@ -473,6 +476,7 @@ static void alertViewInitGlobal() {
 {
     if(!self.superview){
         [self.alertWindow.rootViewController.view addSubview:self];
+        self.keyWindow = [UIApplication sharedApplication].keyWindow;
         [self.alertWindow makeKeyAndVisible];
     }
     [self updateForInterfaceOrientation];
