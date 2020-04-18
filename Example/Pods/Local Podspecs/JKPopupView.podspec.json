@@ -1,0 +1,22 @@
+{
+  "name": "JKPopupView",
+  "version": "0.1.0",
+  "summary": "A short description of JKPopupView.",
+  "description": "TODO: Add long description of the pod here.",
+  "homepage": "https://github.com/weij/JKPopupView",
+  "license": {
+    "type": "MIT",
+    "file": "LICENSE"
+  },
+  "authors": {
+    "weij": "weij@weipaitang.com"
+  },
+  "source": {
+    "git": "https://github.com/weij/JKPopupView.git",
+    "tag": "0.1.0"
+  },
+  "platforms": {
+    "ios": "8.0"
+  },
+  "source_files": "JKPopupView/Classes/**/*"
+}

@@ -1,0 +1,6 @@
+framework module Pods_JKPopupView_Tests {
+  umbrella header "Pods-JKPopupView_Tests-umbrella.h"
+
+  export *
+  module * { export * }
+}
