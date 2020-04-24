@@ -599,7 +599,7 @@ static void alertViewInitGlobal() {
 
 - (void)updateForInterfaceOrientation
 {
-    self.frame = self.window.bounds;
+    self.frame = [UIApplication sharedApplication].keyWindow.bounds;
 }
 #pragma mark - dismiss
 

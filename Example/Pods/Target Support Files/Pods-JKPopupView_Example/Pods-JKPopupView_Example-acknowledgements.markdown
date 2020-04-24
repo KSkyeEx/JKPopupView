@@ -3,7 +3,7 @@ This application makes use of the following third party libraries:
 
 ## JKPopupView
 
-Copyright (c) 2020 weij <weij@weipaitang.com>
+Copyright (c) 2020 weij <weijoker_king@163.com>
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal

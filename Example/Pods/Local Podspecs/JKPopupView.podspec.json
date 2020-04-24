@@ -1,18 +1,18 @@
 {
   "name": "JKPopupView",
   "version": "0.1.0",
-  "summary": "A short description of JKPopupView.",
-  "description": "TODO: Add long description of the pod here.",
-  "homepage": "https://github.com/weij/JKPopupView",
+  "summary": "JKPopupView.以不同的方式弹出各种自定义的视图",
+  "description": "JKPopupView.以不同的方式弹出各种自定义的视图,当传递了view，就显示在view上，否则就在window上",
+  "homepage": "https://github.com/jokerwking/JKPopupView",
   "license": {
     "type": "MIT",
     "file": "LICENSE"
   },
   "authors": {
-    "weij": "weij@weipaitang.com"
+    "weijoker_king": "weijoker_king@163.com"
   },
   "source": {
-    "git": "https://github.com/weij/JKPopupView.git",
+    "git": "https://github.com/jokerwking/JKPopupView.git",
     "tag": "0.1.0"
   },
   "platforms": {
