@@ -8,7 +8,7 @@
 
 Pod::Spec.new do |s|
   s.name             = 'JKPopupView'
-  s.version          = '0.1.1'
+  s.version          = '1.1.1'
   s.summary          = 'JKPopupView.以不同的方式弹出各种自定义的视图'
   s.description      = 'JKPopupView.以不同的方式弹出各种自定义的视图,当传递了view，就显示在view上，否则就在window上'
 
