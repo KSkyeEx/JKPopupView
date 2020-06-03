@@ -11,25 +11,14 @@
 
 static NSInteger const kAnimationOptionCurveIOS7 = (7 << 16);
 
-//全局信号量
-dispatch_semaphore_t globalInstancesLock;
-//执行QUEUE的Name
-char *QUEUE_NAME = "com.alert.queue";
-//初始化 -- 借鉴YYWebImage的写法
-static void alertViewInitGlobal() {
-    static dispatch_once_t onceToken;
-    dispatch_once(&onceToken, ^{
-        globalInstancesLock = dispatch_semaphore_create(1);
-    });
-}
-
 @interface JKPopupController : UIViewController
 
 @end
 
 @implementation JKPopupController
 
-- (UIStatusBarStyle)preferredStatusBarStyle {
+- (UIStatusBarStyle)preferredStatusBarStyle
+{
     return [UIApplication sharedApplication].statusBarStyle;
 }
 
@@ -68,7 +57,6 @@ static void alertViewInitGlobal() {
 {
     self = [super initWithFrame:frame];
     if (self) {
-        alertViewInitGlobal();
         self.userInteractionEnabled = YES;
         self.backgroundColor = [UIColor clearColor];
         self.alpha = 0;
@@ -152,10 +140,6 @@ static void alertViewInitGlobal() {
             [self.keyWindow makeKeyAndVisible];
             self.keyWindow = nil;
         }
-        dispatch_async(dispatch_queue_create(QUEUE_NAME, DISPATCH_QUEUE_SERIAL), ^{
-            //Release Lock
-            dispatch_semaphore_signal(globalInstancesLock);
-        });
         self.isBeingShown = NO;
         self.isShowing = NO;
         self.isBeingDismissed = NO;
@@ -245,24 +229,19 @@ static void alertViewInitGlobal() {
         self.isShowing = NO;
         self.isBeingDismissed = NO;
         [self willStartShowing];
-        dispatch_async(dispatch_queue_create(QUEUE_NAME, DISPATCH_QUEUE_SERIAL), ^{
-            //Lock
-            dispatch_semaphore_wait(globalInstancesLock, DISPATCH_TIME_FOREVER);
-            dispatch_async(dispatch_get_main_queue(), ^{
-                // 1.先把当前视图添加到window或者view上
-                [self setupAddSelfToView:view];
-                
-                [self setupBackgroundView:self.backgroundView maskType:self.maskType showType:self.showType];
-                
-                [self addContentView:self.contentView containerView:self.containerView];
-                
-                [self setupFrameWithLayout:layout finalContainerFrame:self.finalContainerFrame containerAutoresizingMask:self.containerAutoresizingMask];
-                
-                self.containerView.autoresizingMask = self.containerAutoresizingMask;
-                
-                [self showWithType:self.showType containerView:self.containerView finalContainerFrame:self.finalContainerFrame];
-            });
-        });
+
+        // 1.先把当前视图添加到window或者view上
+        [self setupAddSelfToView:view];
+        
+        [self setupBackgroundView:self.backgroundView maskType:self.maskType showType:self.showType];
+        
+        [self addContentView:self.contentView containerView:self.containerView];
+        
+        [self setupFrameWithLayout:layout finalContainerFrame:self.finalContainerFrame containerAutoresizingMask:self.containerAutoresizingMask];
+        
+        self.containerView.autoresizingMask = self.containerAutoresizingMask;
+        
+        [self showWithType:self.showType containerView:self.containerView finalContainerFrame:self.finalContainerFrame];
     }
 }
 #pragma mark - private
@@ -427,7 +406,6 @@ static void alertViewInitGlobal() {
 
 - (void)setupAddSelfToView:(UIView *)view {
     if (view && self.superview != view) {
-        [self removeFromSuperview];
         [view addSubview:self];
     } else if (!view) {
         [self removeFromSuperview];
@@ -629,6 +607,7 @@ static void alertViewInitGlobal() {
             case JKPopupDismissTypeFadeOut:
             {
                 [UIView animateWithDuration:0.15 delay:0 options:UIViewAnimationOptionCurveLinear animations:^{
+                    self.backgroundView.alpha = 0.0;
                     self.containerView.alpha = 0.0;
                 } completion:self.dismissCompletionBlock];
                 break;
@@ -636,6 +615,7 @@ static void alertViewInitGlobal() {
             case JKPopupDismissTypeGrowOut:
             {
                 [UIView animateWithDuration:0.15 delay:0 options:kAnimationOptionCurveIOS7 animations:^{
+                    self.backgroundView.alpha = 0.0;
                     self.containerView.alpha = 0.0;
                     self.containerView.transform = CGAffineTransformMakeScale(1.1, 1.1);
                 } completion:self.dismissCompletionBlock];
@@ -644,6 +624,7 @@ static void alertViewInitGlobal() {
             case JKPopupDismissTypeShrinkOut:
             {
                 [UIView animateWithDuration:0.15 delay:0 options:kAnimationOptionCurveIOS7 animations:^{
+                    self.backgroundView.alpha = 0.0;
                     self.containerView.alpha = 0.0;
                     self.containerView.transform = CGAffineTransformMakeScale(0.8, 0.8);
                 } completion:self.dismissCompletionBlock];
@@ -652,6 +633,7 @@ static void alertViewInitGlobal() {
             case JKPopupDismissTypeSlideOutToTop:
             {
                 [UIView animateWithDuration:0.30 delay:0 options:kAnimationOptionCurveIOS7 animations:^{
+                    self.backgroundView.alpha = 0.0;
                     CGRect finalFrame = self.containerView.frame;
                     finalFrame.origin.y = -CGRectGetHeight(finalFrame);
                     self.containerView.frame = finalFrame;
@@ -661,6 +643,7 @@ static void alertViewInitGlobal() {
             case JKPopupDismissTypeSlideOutToBottom:
             {
                 [UIView animateWithDuration:0.30 delay:0 options:kAnimationOptionCurveIOS7 animations:^{
+                    self.backgroundView.alpha = 0.0;
                     CGRect finalFrame = self.containerView.frame;
                     finalFrame.origin.y = CGRectGetHeight(self.bounds);
                     self.containerView.frame = finalFrame;
@@ -670,6 +653,7 @@ static void alertViewInitGlobal() {
             case JKPopupDismissTypeSlideOutToLeft:
             {
                 [UIView animateWithDuration:0.30 delay:0 options:kAnimationOptionCurveIOS7 animations:^{
+                    self.backgroundView.alpha = 0.0;
                     CGRect finalFrame = self.containerView.frame;
                     finalFrame.origin.x = -CGRectGetWidth(finalFrame);
                     self.containerView.frame = finalFrame;
@@ -678,6 +662,7 @@ static void alertViewInitGlobal() {
             }
             case JKPopupDismissTypeSlideOutToRight: {
                 [UIView animateWithDuration:0.30 delay:0 options:kAnimationOptionCurveIOS7 animations:^{
+                    self.backgroundView.alpha = 0.0;
                     CGRect finalFrame = self.containerView.frame;
                     finalFrame.origin.x = CGRectGetWidth(self.bounds);
                     self.containerView.frame = finalFrame;
@@ -690,6 +675,7 @@ static void alertViewInitGlobal() {
                     self.containerView.transform = CGAffineTransformMakeScale(1.1, 1.1);
                 } completion:^(BOOL finished){
                     [UIView animateWithDuration:bounce2Duration delay:0 options:UIViewAnimationOptionCurveEaseIn animations:^(void){
+                        self.backgroundView.alpha = 0.0;
                         self.containerView.alpha = 0.0;
                         self.containerView.transform = CGAffineTransformMakeScale(0.1, 0.1);
                     } completion:self.dismissCompletionBlock];
@@ -702,6 +688,7 @@ static void alertViewInitGlobal() {
                     CGRect finalFrame = self.containerView.frame;
                     finalFrame.origin.y += 40.0;
                     self.containerView.frame = finalFrame;
+                    self.backgroundView.alpha = 0.0;
                 } completion:^(BOOL finished){
                     [UIView animateWithDuration:bounce2Duration delay:0 options:UIViewAnimationOptionCurveEaseIn animations:^(void){
                         CGRect finalFrame = self.containerView.frame;
@@ -717,6 +704,7 @@ static void alertViewInitGlobal() {
                     CGRect finalFrame = self.containerView.frame;
                     finalFrame.origin.y -= 40.0;
                     self.containerView.frame = finalFrame;
+                    self.backgroundView.alpha = 0.0;
                 } completion:^(BOOL finished){
                     [UIView animateWithDuration:bounce2Duration delay:0 options:UIViewAnimationOptionCurveEaseIn animations:^(void){
                         CGRect finalFrame = self.containerView.frame;
@@ -732,6 +720,7 @@ static void alertViewInitGlobal() {
                     CGRect finalFrame = self.containerView.frame;
                     finalFrame.origin.x += 40.0;
                     self.containerView.frame = finalFrame;
+                    self.backgroundView.alpha = 0.0;
                 } completion:^(BOOL finished){
                     [UIView animateWithDuration:bounce2Duration delay:0 options:UIViewAnimationOptionCurveEaseIn animations:^(void){
                         CGRect finalFrame = self.containerView.frame;
@@ -747,6 +736,7 @@ static void alertViewInitGlobal() {
                     CGRect finalFrame = self.containerView.frame;
                     finalFrame.origin.x -= 40.0;
                     self.containerView.frame = finalFrame;
+                    self.backgroundView.alpha = 0.0;
                 } completion:^(BOOL finished){
                     [UIView animateWithDuration:bounce2Duration delay:0 options:UIViewAnimationOptionCurveEaseIn animations:^(void){
                         CGRect finalFrame = self.containerView.frame;
@@ -758,6 +748,7 @@ static void alertViewInitGlobal() {
             }
             default: {
                 self.containerView.alpha = 0.0;
+                self.backgroundView.alpha = 0.0;
                 self.dismissCompletionBlock(YES);
                 break;
             }

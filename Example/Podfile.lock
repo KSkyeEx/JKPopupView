@@ -4,7 +4,7 @@ PODS:
   - FBSnapshotTestCase/Core (2.1.4)
   - FBSnapshotTestCase/SwiftSupport (2.1.4):
     - FBSnapshotTestCase/Core
-  - JKPopupView (0.1.0)
+  - JKPopupView (0.1.1)
   - Kiwi (3.0.0)
 
 DEPENDENCIES:
@@ -23,9 +23,9 @@ EXTERNAL SOURCES:
 
 SPEC CHECKSUMS:
   FBSnapshotTestCase: 094f9f314decbabe373b87cc339bea235a63e07a
-  JKPopupView: e80e2b1851d0e36275f70e4c8a13585171143dcc
+  JKPopupView: 5925bbeb42ed45e5943a1540bf2ed7280a762b84
   Kiwi: fbeafef0f00e4d8f7dcb3420a4930afe70af77f7
 
-PODFILE CHECKSUM: a599c1e477043c87f1ded4b5a4373034d277f04a
+PODFILE CHECKSUM: 86aec933b163ceff920bc05a61001095bcb78bca
 
 COCOAPODS: 1.9.1

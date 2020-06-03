@@ -351,9 +351,9 @@ typedef NS_ENUM(NSInteger, CellType) {
 - (void)showButtonPressed:(id)sender
 {
     [self testAlert];
-    [self testAlert];
-    [self testAlert];
-    [self testAlert];
+    [self testAlert2];
+    [self testAlert2];
+    [self testAlert2];
 }
 
 - (void)testAlert {
@@ -410,6 +410,59 @@ typedef NS_ENUM(NSInteger, CellType) {
     }
 }
 
+- (void)testAlert2 {
+    // Generate content view to present
+    UIView *contentView = [[UIView alloc] init];
+    contentView.translatesAutoresizingMaskIntoConstraints = NO;
+    contentView.backgroundColor = [UIColor JKLightGreenColor];
+    contentView.layer.cornerRadius = 12.0;
+    
+    UILabel *dismissLabel = [[UILabel alloc] init];
+    dismissLabel.translatesAutoresizingMaskIntoConstraints = NO;
+    dismissLabel.backgroundColor = [UIColor clearColor];
+    dismissLabel.textColor = [UIColor whiteColor];
+    dismissLabel.font = [UIFont boldSystemFontOfSize:72.0];
+    dismissLabel.text = @"OK.";
+    
+    UIButton *dismissButton = [UIButton buttonWithType:UIButtonTypeCustom];
+    dismissButton.translatesAutoresizingMaskIntoConstraints = NO;
+    dismissButton.contentEdgeInsets = UIEdgeInsetsMake(10, 20, 10, 20);
+    dismissButton.backgroundColor = [UIColor JKGreenColor];
+    [dismissButton setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
+    [dismissButton setTitleColor:[[dismissButton titleColorForState:UIControlStateNormal] colorWithAlphaComponent:0.5] forState:UIControlStateHighlighted];
+    dismissButton.titleLabel.font = [UIFont boldSystemFontOfSize:16.0];
+    [dismissButton setTitle:@"Miss" forState:UIControlStateNormal];
+    dismissButton.layer.cornerRadius = 6.0;
+    [dismissButton addTarget:self action:@selector(dismissButtonPressed:) forControlEvents:UIControlEventTouchUpInside];
+    
+    [contentView addSubview:dismissLabel];
+    [contentView addSubview:dismissButton];
+    
+    NSDictionary *views = NSDictionaryOfVariableBindings(contentView, dismissButton, dismissLabel);
+    
+    [contentView addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"V:|-(16)-[dismissLabel]-(10)-[dismissButton]-(24)-|"
+                                                                        options:NSLayoutFormatAlignAllCenterX
+                                                                        metrics:nil
+                                                                          views:views]];
+    
+    [contentView addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"H:|-(36)-[dismissLabel]-(36)-|"
+                                                                        options:0
+                                                                        metrics:nil
+                                                                          views:views]];
+    
+    // Show in popup
+    JKPopupLayout *layout = [JKPopupLayout JKPopupLayoutMakeHorizontal:(JKPopupHorizontalLayout)[self valueForRow: self.selectedRowInHorizontalField inFieldWithTag:FieldTagHorizontalLayout] vertical:(JKPopupVerticalLayout)[self valueForRow: self.selectedRowInVerticalField inFieldWithTag:FieldTagVerticalLayout]];
+    JKPopupView *popup = [JKPopupView popupWithContentView:contentView
+                                                  showType:(JKPopupShowType)[self valueForRow: self.selectedRowInShowField inFieldWithTag:FieldTagShowType]
+                                               dismissType:(JKPopupDismissType)[self valueForRow: self.selectedRowInDismissField inFieldWithTag:FieldTagDismissType]
+                                                  maskType:JKPopupMaskTypeNone
+                                  dismissOnBackgroundTouch:self.shouldDismissOnBackgroundTouch dismissOnContentTouch:self.shouldDismissOnContentTouch];
+    if ( self.shouldDismissAfterDelay) {
+        [popup showWithLayout:layout duration:2.0];
+    } else {
+        [popup showWithLayout:layout];
+    }
+}
 
 - (void)dismissButtonPressed:(id)sender
 {
